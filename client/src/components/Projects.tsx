@@ -6,7 +6,16 @@ import { useQuery } from "@tanstack/react-query";
 import { getProjects } from "@/lib/firebase";
 
 // Fallback projects data in case of error
-const fallbackProjects = [];
+const fallbackProjects: Array<{
+  id: number;
+  title: string;
+  description: string;
+  imageUrl: string;
+  category: string;
+  technologies: string[];
+  liveUrl?: string;
+  githubUrl?: string;
+}> = [];
 
 export default function Projects() {
   const [filter, setFilter] = useState("all");
@@ -18,7 +27,10 @@ export default function Projects() {
     queryFn: getProjects
   });
   
-  const filteredProjects = projects.filter(
+  // Type assertion for the projects data
+  const typedProjects = projects as typeof fallbackProjects;
+  
+  const filteredProjects = typedProjects.filter(
     project => filter === "all" || project.category === filter
   );
 

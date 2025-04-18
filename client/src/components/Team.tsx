@@ -5,7 +5,18 @@ import { useQuery } from "@tanstack/react-query";
 import { getTeamMembers } from "@/lib/firebase";
 
 // Fallback team data in case of error
-const fallbackTeam = [];
+const fallbackTeam: Array<{
+  id: number;
+  name: string;
+  role: string;
+  bio: string;
+  imageUrl: string;
+  email: string;
+  social?: {
+    linkedin?: string;
+    twitter?: string;
+  };
+}> = [];
 
 export default function Team() {
   const ref = useRef(null);
@@ -16,6 +27,9 @@ export default function Team() {
     queryKey: ['team'],
     queryFn: getTeamMembers
   });
+  
+  // Type assertion for team data
+  const typedTeam = team as typeof fallbackTeam;
 
   return (
     <section id="team" ref={ref} className="py-20 bg-gray-50">
@@ -35,7 +49,7 @@ export default function Team() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {team.map((member, index) => (
+          {typedTeam.map((member, index) => (
             <TeamCard
               key={member.id}
               name={member.name}

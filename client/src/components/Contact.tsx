@@ -16,8 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { MapPin, Mail, Phone } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { saveContact } from "@/lib/firebase";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -42,18 +42,27 @@ export default function Contact() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => {
-      return apiRequest("POST", "/api/contact", values);
+      // Save contact data to Firebase
+      return saveContact(values);
     },
-    onSuccess: () => {
-      toast({
-        title: "Message Sent!",
-        description: "We'll get back to you as soon as possible.",
-        variant: "default",
-      });
-      form.reset();
-      setIsSubmitted(true);
+    onSuccess: (result) => {
+      if (result.success) {
+        toast({
+          title: "Message Sent!",
+          description: "We'll get back to you as soon as possible.",
+          variant: "default",
+        });
+        form.reset();
+        setIsSubmitted(true);
+      } else {
+        toast({
+          title: "Something went wrong!",
+          description: "Could not save your message. Please try again.",
+          variant: "destructive",
+        });
+      }
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Something went wrong!",
         description: error.message || "Please try again later.",
