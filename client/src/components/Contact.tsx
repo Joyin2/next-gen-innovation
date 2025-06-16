@@ -1,239 +1,189 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { MapPin, Mail, Phone } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
-import { useToast } from "@/hooks/use-toast";
-import { saveContact } from "@/lib/firebase";
-
-const formSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  email: z.string().email({ message: "Please enter a valid email address." }),
-  subject: z.string().min(5, { message: "Subject must be at least 5 characters." }),
-  message: z.string().min(10, { message: "Message must be at least 10 characters." }),
-});
+import { Send, Mail, Phone, User, MessageSquare } from "lucide-react";
 
 export default function Contact() {
-  const { toast } = useToast();
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      subject: "",
-      message: "",
-    },
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    message: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState("");
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: async (values: z.infer<typeof formSchema>) => {
-      // Save contact data to Firebase
-      return saveContact(values);
-    },
-    onSuccess: (result) => {
-      if (result.success) {
-        toast({
-          title: "Message Sent!",
-          description: "We'll get back to you as soon as possible.",
-          variant: "default",
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError("");
+    
+    try {
+      // Simulate form submission
+      console.log("Form data submitted:", formData);
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setIsSuccess(true);
+      
+      // Reset form after 2 seconds
+      setTimeout(() => {
+        setIsSuccess(false);
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          message: "",
         });
-        form.reset();
-        setIsSubmitted(true);
+      }, 2000);
+    } catch (err) {
+      console.error("Error submitting form:", err);
+      if (err instanceof Error) {
+        setError(`Error: ${err.message}`);
       } else {
-        toast({
-          title: "Something went wrong!",
-          description: "Could not save your message. Please try again.",
-          variant: "destructive",
-        });
+        setError("There was an error submitting your message. Please try again.");
       }
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Something went wrong!",
-        description: error.message || "Please try again later.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    mutate(values);
-  }
-
-  const contactItems = [
-    {
-      icon: <MapPin className="h-6 w-6 text-indigo-500" />,
-      title: "Visit Us",
-      details: ["123 Innovation Way", "Tech District", "San Francisco, CA 94107"],
-    },
-    {
-      icon: <Mail className="h-6 w-6 text-indigo-500" />,
-      title: "Email Us",
-      details: ["info@technova.com", "support@technova.com"],
-    },
-    {
-      icon: <Phone className="h-6 w-6 text-indigo-500" />,
-      title: "Call Us",
-      details: ["+1 (555) 123-4567", "+1 (555) 987-6543"],
-    },
-  ];
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
-    <section id="contact" className="py-20 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true, amount: 0.2 }}
-          >
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Get in Touch</h2>
-            <div className="w-20 h-1 bg-indigo-500 mx-auto mb-6"></div>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Have questions about our services or want to discuss your project? Reach out to us!
-            </p>
-          </motion.div>
+    <section id="contact" className="py-16 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-muted/40 to-muted/20 backdrop-blur-sm dark:from-gray-900/40 dark:to-gray-900/20"></div>
+      
+      <div className="container relative mx-auto px-6 sm:px-8 md:px-12 lg:px-16 z-10">
+        <div className="flex flex-col items-center text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-700 drop-shadow-sm dark:drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
+              Contact Us
+            </span>
+          </h2>
+          
+          <div className="w-24 h-1 bg-gradient-to-r from-cyan-500 to-blue-700 rounded-full mb-6" />
+          
+          <p className="text-lg text-center text-muted-foreground max-w-3xl mx-auto">
+            Have a question or want to work together? Reach out to us!
+          </p>
         </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          {/* Contact Details */}
-          <div className="lg:col-span-1">
-            <div className="space-y-8">
-              {contactItems.map((item, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  viewport={{ once: true, amount: 0.2 }}
-                  className="flex"
-                >
-                  <div className="mt-1 flex-shrink-0">{item.icon}</div>
-                  <div className="ml-4">
-                    <h3 className="text-lg font-semibold text-gray-900">{item.title}</h3>
-                    <div className="mt-1 text-gray-600">
-                      {item.details.map((detail, idx) => (
-                        <p key={idx}>{detail}</p>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-
-          {/* Contact Form */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true, amount: 0.2 }}
-            className="lg:col-span-2 bg-gray-50 rounded-xl p-8 shadow-lg"
-          >
-            {isSubmitted ? (
-              <div className="text-center py-12">
-                <div className="mb-6 mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-600" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Thank You!</h3>
-                <p className="text-gray-600 mb-6">Your message has been sent successfully. We'll get back to you shortly.</p>
-                <Button 
-                  onClick={() => setIsSubmitted(false)}
-                  className="bg-indigo-500 hover:bg-indigo-600"
-                >
-                  Send Another Message
-                </Button>
+        
+        <div className="max-w-3xl mx-auto">
+          {isSuccess ? (
+            <div className="py-12 text-center bg-background/50 dark:bg-gray-800/30 backdrop-blur-md border border-border rounded-xl p-8">
+              <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Send className="h-8 w-8 text-green-600 dark:text-green-400" />
               </div>
-            ) : (
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Your name" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
+              <h3 className="text-xl font-semibold mb-2">Message Sent!</h3>
+              <p className="text-muted-foreground">
+                Thank you for reaching out. We'll be in touch shortly.
+              </p>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="bg-background/50 dark:bg-gray-800/30 backdrop-blur-md border border-border rounded-xl p-8">
+              {error && (
+                <div className="mb-6 p-4 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-md">
+                  {error}
+                </div>
+              )}
+              
+              <div className="grid grid-cols-1 gap-6">
+                <div className="space-y-2">
+                  <label htmlFor="name" className="block text-sm font-medium flex items-center gap-2">
+                    <User className="h-4 w-4 text-cyan-500" />
+                    Your Name
+                  </label>
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    placeholder="John Doe"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full p-3 rounded-md border border-border bg-background/50 focus:border-cyan-500 focus:ring-cyan-500"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label htmlFor="email" className="block text-sm font-medium flex items-center gap-2">
+                      <Mail className="h-4 w-4 text-cyan-500" />
+                      Email
+                    </label>
+                    <input
+                      id="email"
                       name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Your email" type="email" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      type="email"
+                      placeholder="john@example.com"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full p-3 rounded-md border border-border bg-background/50 focus:border-cyan-500 focus:ring-cyan-500"
                     />
                   </div>
-                  <FormField
-                    control={form.control}
-                    name="subject"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Subject</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Message subject" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
+                  
+                  <div className="space-y-2">
+                    <label htmlFor="phone" className="block text-sm font-medium flex items-center gap-2">
+                      <Phone className="h-4 w-4 text-cyan-500" />
+                      Phone (Optional)
+                    </label>
+                    <input
+                      id="phone"
+                      name="phone"
+                      type="text"
+                      placeholder="+1 (555) 123-4567"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      className="w-full p-3 rounded-md border border-border bg-background/50 focus:border-cyan-500 focus:ring-cyan-500"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <label htmlFor="message" className="block text-sm font-medium flex items-center gap-2">
+                    <MessageSquare className="h-4 w-4 text-cyan-500" />
+                    Message
+                  </label>
+                  <textarea
+                    id="message"
                     name="message"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Message</FormLabel>
-                        <FormControl>
-                          <Textarea 
-                            placeholder="Your message"
-                            className="min-h-[150px] resize-none"
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    placeholder="Tell us about your project or inquiry..."
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    required
+                    rows={6}
+                    className="w-full p-3 rounded-md border border-border bg-background/50 focus:border-cyan-500 focus:ring-cyan-500"
                   />
-                  <Button 
-                    type="submit" 
-                    disabled={isPending}
-                    className="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-3"
-                  >
-                    {isPending ? "Sending..." : "Send Message"}
-                  </Button>
-                </form>
-              </Form>
-            )}
-          </motion.div>
+                </div>
+                
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full md:w-auto md:self-end px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-700 hover:from-blue-600 hover:to-cyan-600 text-white rounded-md shadow-lg shadow-cyan-500/20 transition-all duration-300 flex items-center justify-center"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="mr-2 h-4 w-4" />
+                      Send Message
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          )}
         </div>
       </div>
     </section>

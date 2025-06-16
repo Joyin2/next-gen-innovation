@@ -9,12 +9,11 @@ export default defineConfig({
       '@': path.resolve(__dirname, './client/src')
     },
   },
+  server: {
+    port: 3000,
+  },
   root: './',
   build: {
     outDir: 'dist',
   },
-  server: {
-    port: 3000,
-    open: true
-  }
 });

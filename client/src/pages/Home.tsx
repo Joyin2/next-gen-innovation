@@ -1,19 +1,22 @@
-import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import Services from "@/components/Services";
-import Team from "@/components/Team";
-import Projects from "@/components/Projects";
 import Contact from "@/components/Contact";
-import Footer from "@/components/Footer";
+import AnimatedSlogan from "@/components/AnimatedSlogan";
+import MissionSection from "@/components/MissionSection";
 import { useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
+import OurTeamSection from "@/components/OurTeamSection";
 
 export default function Home() {
+  // Scroll to top on component mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // Smooth scroll initialization
   useEffect(() => {
     // Add smooth scrolling to all links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
+      addEventListener('click', function (e) {
         e.preventDefault();
         
         const target = document.querySelector(this.getAttribute('href')!);
@@ -36,15 +39,12 @@ export default function Home() {
   return (
     <AnimatePresence>
       <div className="bg-background text-foreground min-h-screen overflow-x-hidden">
-        <Navbar />
         <main>
           <Hero />
-          <Services />
-          <Projects />
-          <Team />
-          <Contact />
+          <AnimatedSlogan />
+          <MissionSection />
         </main>
-        <Footer />
+       
       </div>
     </AnimatePresence>
   );
