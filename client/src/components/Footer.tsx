@@ -45,10 +45,10 @@ export default function Footer() {
                   />
                 </div>
                 <div className="flex flex-col -space-y-1">
-                  <span className="text-sm md:text-base font-bold text-white dark:text-white">
+                  <span className="text-sm md:text-base font-bold text-foreground">
                     Next Generation
                   </span>
-                  <span className="text-sm md:text-base font-bold text-white dark:text-white">
+                  <span className="text-sm md:text-base font-bold text-foreground">
                     Innovation L.L.C.
                   </span>
                 </div>
@@ -191,7 +191,7 @@ export default function Footer() {
               animate={{ opacity: 1 }}
               transition={{ duration: 1 }}
             >
-              <div className="text-sm sm:text-base font-medium text-white dark:text-white">
+              <div className="text-sm sm:text-base font-medium text-foreground">
                 © {currentYear} Next Generation Innovation L.L.C.
               </div>
             </motion.div>
